@@ -11,35 +11,35 @@ const placesList = document.querySelector('.places__list');
 
 // @todo: Функция создания карточки
 
-const createCard = (arr, cbRemove) => {
+const createCard = function(item, cbRemove) {
 
-  arr.forEach((item) => {
-    const cloneCard = card.cloneNode(true),
-          cardImg = cloneCard.querySelector('.card__image'),
-          cardTitle = cloneCard.querySelector('.card__title'),
-          btnDelete = cloneCard.querySelector('.card__delete-button');
-          
-    cardImg.setAttribute('src', item.link);
-    cardImg.setAttribute('alt', item.name);
-    cardTitle.textContent = item.name;
+  const cloneCard = card.cloneNode(true),
+      cardImg = cloneCard.querySelector('.card__image'),
+      cardTitle = cloneCard.querySelector('.card__title'),
+      btnDelete = cloneCard.querySelector('.card__delete-button');
+        
+  cardImg.setAttribute('src', item.link);
+  cardImg.setAttribute('alt', item.name);
+  cardTitle.textContent = item.name;
 
-    btnDelete.addEventListener('click', cbRemove);
+  btnDelete.addEventListener('click', cbRemove);
 
-    placesList.append(cloneCard);
-
-  });
+  return cloneCard;
 };
 
 
 // @todo: Функция удаления карточки
 
 function removeCard(evt) {
-  let target = evt.target;
-  let card = target.closest('.card');
+  const target = evt.target;
+  const card = target.closest('.card');
   card.remove();
 };
 
 
 // @todo: Вывести карточки на страницу
 
-createCard(initialCards, removeCard);
+initialCards.forEach((item) => {
+  const newCard = createCard(item, removeCard);
+  placesList.append(newCard);
+});
