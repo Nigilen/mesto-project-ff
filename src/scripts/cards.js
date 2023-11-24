@@ -25,10 +25,13 @@ const initialCards = [
     }
 ];
 
+const popupImage = document.querySelector('.popup_type_image');
+const popupPicture = popupImage.querySelector('.popup__image');
+const popupCaption = popupImage.querySelector('.popup__caption');
+
 function createCard(item, cbRemove, cbLike, cbFullImg) {
   const content = document.querySelector('#card-template').content;
   const card = content.querySelector('.card');
-  const popupImage = document.querySelector('.popup_type_image');
   const cloneCard = card.cloneNode(true);
   const cardImg = cloneCard.querySelector('.card__image');
   const cardTitle = cloneCard.querySelector('.card__title');
@@ -43,9 +46,10 @@ function createCard(item, cbRemove, cbLike, cbFullImg) {
 
   cardLike.addEventListener('click', () => cbLike(cardLike) );
 
-  cardImg.addEventListener('click', function() {
-    popupImage.querySelector('.popup__image').src = cardImg.src;
-    popupImage.querySelector('.popup__caption').textContent = cardTitle.textContent;
+  cardImg.addEventListener('click', () => {
+    popupPicture.src = cardImg.src;
+    popupPicture.setAttribute('alt', cardTitle.textContent);
+    popupCaption.textContent = cardTitle.textContent;
     cbFullImg(popupImage);
   });
 

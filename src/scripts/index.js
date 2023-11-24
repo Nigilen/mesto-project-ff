@@ -1,5 +1,5 @@
-import { initialCards, createCard,  like, removeCard } from './cards.js'
-import { openPopup, closePopup } from './modal.js'
+import { initialCards, createCard,  like, removeCard} from './cards.js'
+import { openPopup, closePopup} from './modal.js'
 
 import '../pages/index.css';
 
@@ -18,6 +18,18 @@ const profileDescription = document.querySelector('.profile__description');
 
 const placesList = document.querySelector('.places__list');
 
+const popups = document.querySelectorAll('.popup');
+
+popups.forEach((popup) => {
+  popup.addEventListener('mousedown', evt => {
+    if (evt.target.classList.contains('popup_is-opened')) {
+      closePopup(popup);
+    };
+    if (evt.target.classList.contains('popup__close')) {
+      closePopup(popup);
+    };
+  });
+});
 
 function handleSubmitForm(evt) {
   evt.preventDefault();
@@ -25,16 +37,19 @@ function handleSubmitForm(evt) {
 };
 
 editBtn.addEventListener('click', () => {
+  editForm.reset();
   openPopup(popupTypeEdit);
   editForm.name.value = profileTitle.textContent;
   editForm.description.value = profileDescription.textContent;
 });
 
 addBtn.addEventListener('click', () => {
+  newPlaceForm.reset();
   openPopup(popupTypeNewCard);
 });
 
 editForm.addEventListener('submit', (evt) => {
+  
   profileTitle.textContent = editForm.name.value;
   profileDescription.textContent = editForm.description.value;
 
@@ -42,7 +57,6 @@ editForm.addEventListener('submit', (evt) => {
 });
 
 newPlaceForm.addEventListener('submit', (evt) => {
-  
   const newCard = createCard(
     { 
       name: newPlaceForm.elements['place-name'].value, 
