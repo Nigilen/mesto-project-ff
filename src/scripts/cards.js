@@ -20,30 +20,54 @@ function createCard(item, cbRemove, cbLike, cbFullImg, userId) {
   cardImg.setAttribute('src', item.link);
   cardImg.setAttribute('alt', item.name);
   cardTitle.textContent = item.name;
+  cardLikeCounter.textContent = item.likes.length;
 
-  if(item.owner) {
-    item.likes.forEach((like) => {    
-      if (like._id == userId) {
-        cardLike.classList.add('card__like-button_is-active');
+
+  item.likes.forEach((like) => {    
+    if (like._id == userId) {
+      cardLike.classList.add('card__like-button_is-active');
+    }
+  })
+
+  if (item.owner._id == userId) {
+    btnDelete.addEventListener('click', () => {
+      openPopup(deletePopup);
+
+      const deleteCard = function(evt) {
+        evt.preventDefault();
+        cbRemove(cloneCard, item._id);
+        closePopup(evt.target.closest('.popup'));
       }
-    })
-    cardLikeCounter.textContent = item.likes.length;
-    if (item.owner._id == userId) {
-      btnDelete.addEventListener('click', () => {
-        openPopup(deletePopup);
-        
-        deletePopupForm.addEventListener('submit', (evt) => {
-          evt.preventDefault();
-          cbRemove(cloneCard, item._id);
-          closePopup(evt.target.closest('.popup'));
-        })
+
+      new Promise(function(resolve, reject) {
+        const handleClickDelPopup = function(evt) {
+          if(evt.target.classList.contains('button')) {
+            deletePopup.removeEventListener('mousedown', handleClickDelPopup);
+            document.removeEventListener('keydown', handleClickDelPopup);
+            resolve()
+          } else if (evt.target.classList.contains('popup_type_delete-card') || 
+                    evt.target.classList.contains('popup__close') ||
+                    evt.key === "Escape") {
+            deletePopup.removeEventListener('mousedown', handleClickDelPopup);
+            document.removeEventListener('keydown', handleClickDelPopup);
+            reject()
+          } 
+        }
+        deletePopup.addEventListener('mousedown', handleClickDelPopup);
+        document.addEventListener('keydown', handleClickDelPopup);
       })
-    } else {
-      btnDelete.remove();
-    };
-  }
-
-
+      .then(() => {
+        deletePopupForm.addEventListener('submit', deleteCard);
+      })
+      .catch(() => {
+        deletePopupForm.removeEventListener('submit', deleteCard);
+      })
+  
+    })
+  } else {
+    btnDelete.remove();
+  };
+           
   cardLike.addEventListener('click', () => cbLike(cardLike, item._id) );
 
   cardImg.addEventListener('click', () => {
@@ -58,19 +82,33 @@ function createCard(item, cbRemove, cbLike, cbFullImg, userId) {
 
 function like(item, cardId) {
   if (item.classList.contains('card__like-button_is-active')) {
-    item.classList.remove('card__like-button_is-active');
-    likeCard(cardId, item, 'DELETE');
+    likeCard(cardId, 'DELETE')
+      .then((data) => {
+        item.classList.remove('card__like-button_is-active');
+        item.nextElementSibling.textContent = data.likes.length;
+      })
+      .catch((err) => {
+        console.log(err);
+      });;
   } else {
-    item.classList.add('card__like-button_is-active');
-    likeCard(cardId, item, 'PUT');
+    likeCard(cardId, 'PUT')
+      .then((data) => {
+        item.classList.add('card__like-button_is-active');
+        item.nextElementSibling.textContent = data.likes.length;
+      })
+      .catch((err) => {
+        console.log(err);
+      });;
   };
 };
 
 
 function removeCard(card, id) {
-  console.log(card)
-  card.remove();
-  deleteCard(id);
+  deleteCard(id)
+    .then(card.remove())
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 export {createCard, like, removeCard};

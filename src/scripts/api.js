@@ -1,3 +1,5 @@
+import {checkResponse} from './utils.js'
+
 export const config = {
   baseUrl: 'https://mesto.nomoreparties.co/v1/wff-cohort-3',
   headers: {
@@ -6,49 +8,30 @@ export const config = {
   }
 }
 
+function request(url, options) {
+  return fetch(`${config.baseUrl}` + url, options).then(checkResponse)
+}
+
 export const getInitialCards = () => {
-  return fetch(`${config.baseUrl}/cards`, {
-    headers: config.headers
-  })
-  .then(res => {
-    if (res.ok) {
-      return res.json()
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-  
+  return request('/cards', { headers: config.headers })
 }
 
 export const getUserInfo = () => {
-  return fetch(`${config.baseUrl}/users/me`, {
-    headers: config.headers
-  })
-  .then(res => {
-    if (res.ok) {
-      return res.json()
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
+  return request('/users/me', { headers: config.headers })
 }
 
 export const patchUserAvatar = (ava) => {
-  return fetch(`${config.baseUrl}/users/me/avatar`, {
+  return request('/users/me/avatar', {
     method: 'PATCH',
     headers: config.headers, 
     body: JSON.stringify({
       avatar: ava
-    })
+    }) 
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json()
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-}
+}  
 
 export const patchUserInfo = (userName, userAbout) => {
-  return fetch(`${config.baseUrl}/users/me`, {
+  return request('/users/me', { 
     method: 'PATCH',
     headers: config.headers,
     body: JSON.stringify({
@@ -56,16 +39,10 @@ export const patchUserInfo = (userName, userAbout) => {
       about: userAbout
     }) 
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json()
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
 }
 
 export const postNewCard = (cardName, cardLink) => {
-  return fetch(`${config.baseUrl}/cards`, {
+  return request('/cards', { 
     method: 'POST',
     headers: config.headers, 
     body: JSON.stringify({
@@ -73,45 +50,18 @@ export const postNewCard = (cardName, cardLink) => {
       link: cardLink
     })
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json()
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
 }
 
-
-export const likeCard = (id, item, met) => {
-  return fetch(`https://mesto.nomoreparties.co/v1/wff-cohort-3/cards/likes/${id}`, {
-    method: met,
-    headers: {
-      authorization: '397c7185-000a-4a1c-a6b0-631c387bbfc7'
-    }
+export const likeCard = (id, mtd) => {
+  return request(`/cards/likes/${id}`, { 
+    method: mtd,
+    headers: config.headers
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json()
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
-  .then((data) => {
-    item.nextElementSibling.textContent = data.likes.length;
-  });
 } 
 
-
 export const deleteCard = (id) => {
-  return fetch(`https://mesto.nomoreparties.co/v1/wff-cohort-3/cards/${id}`, {
+  return request(`/cards/${id}`, { 
     method: 'DELETE',
-    headers: {
-      authorization: '397c7185-000a-4a1c-a6b0-631c387bbfc7'
-    }
-  })
-  .then(res => {
-    if (res.ok) {
-      return res.json()
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
+    headers: config.headers
   })
 }

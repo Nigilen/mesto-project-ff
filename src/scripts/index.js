@@ -2,6 +2,7 @@ import { createCard, like, removeCard} from './cards.js'
 import { openPopup, closePopup} from './modal.js'
 import { enableValidation, clearValidation } from './validation.js';
 import { getUserInfo, getInitialCards, patchUserAvatar, patchUserInfo, postNewCard } from './api.js';
+import { handleSubmit } from './utils.js';
 
 import '../pages/index.css';
 
@@ -36,27 +37,16 @@ const settings = {
 
 popups.forEach((popup) => {
   popup.addEventListener('mousedown', evt => {
-    if (evt.target.classList.contains('popup_is-opened')) {
-      closePopup(popup);
-    };
-    if (evt.target.classList.contains('popup__close')) {
-      closePopup(popup);
-    };
+    if (evt.target.classList.contains('popup_is-opened')) closePopup(popup);
+    if (evt.target.classList.contains('popup__close')) closePopup(popup);
   });
 });
 
-
-function handleSubmitForm(evt) {
-  evt.preventDefault();
-  closePopup(evt.target.closest('.popup'));
-};
-
 editBtn.addEventListener('click', () => {
   editForm.reset();
-
   clearValidation(settings, editForm);
-
   openPopup(popupTypeEdit);
+
   editForm.name.value = profileTitle.textContent;
   editForm.description.value = profileDescription.textContent;
 });
@@ -67,7 +57,6 @@ addBtn.addEventListener('click', () => {
   openPopup(popupTypeNewCard);
 });
 
-
 editAvatar.addEventListener('click', () => {
   editAvatarForm.reset();
   clearValidation(settings, popupEditAvatar);
@@ -75,69 +64,45 @@ editAvatar.addEventListener('click', () => {
 });
 
 editAvatarForm.addEventListener('submit', (evt) => {
-  renderLoading(true, editAvatarForm);
-
-  patchUserAvatar(editAvatarForm.elements.link.value)
-    .catch((err) => {
-      console.log(err);
-    })
-
-  editAvatar.style.backgroundImage = "url()"
-
-  handleSubmitForm(evt);
+  function makeRequest() {
+    return patchUserAvatar(editAvatarForm.elements.link.value)
+      .then(editAvatar.style.backgroundImage = `url(${editAvatarForm.elements.link.value})`)
+      .then(closePopup(evt.target.closest('.popup')));
+  }
+  handleSubmit(makeRequest, evt);
 });
 
 editForm.addEventListener('submit', (evt) => {
-  renderLoading(true, editForm);
-  patchUserInfo(editForm.name.value, editForm.description.value)
-    .catch((err) => {
-      console.log(err);
-    })
-    .finally(() => {
-      renderLoading(false, editForm);
-    });
-  
-  profileTitle.textContent = editForm.name.value;
-  profileDescription.textContent = editForm.description.value;
-
-  handleSubmitForm(evt);
-});
-
+  function makeRequest() {
+    return patchUserInfo(editForm.name.value, editForm.description.value)
+      .then((userData) => {
+        profileTitle.textContent = userData.name;
+        profileDescription.textContent = userData.about;
+      })
+      .then(closePopup(evt.target.closest('.popup')));
+  }
+  handleSubmit(makeRequest, evt);
+})
 
 newPlaceForm.addEventListener('submit', (evt) => {
-  evt.preventDefault();
-  renderLoading(true, newPlaceForm);
-  postNewCard(newPlaceForm.elements['place-name'].value, newPlaceForm.elements.link.value)
-    .catch((err) => {
-      console.log(err);
-    })
-    .finally(() => {
-      renderLoading(false, newPlaceForm);
-    });
-
-  const newCard = createCard(
-    { 
-      name: newPlaceForm.elements['place-name'].value, 
-      link: newPlaceForm.elements.link.value 
-    },
-    removeCard, 
-    like, 
-    openPopup
-  );
-  
-  placesList.prepend(newCard);
-
-  handleSubmitForm(evt);
+  function makeRequest() {
+    return postNewCard(newPlaceForm.elements['place-name'].value, newPlaceForm.elements.link.value)
+      .then(() => {
+        getInitialCards()
+          .then((cards) => {
+            placesList.innerHTML = '';
+            cards.forEach((item) => {
+              const newCard = createCard(item, removeCard, like, openPopup, "bfb916be30e790576dcc2d84");
+              placesList.append(newCard);
+            });
+          })
+      })
+      .then(closePopup(evt.target.closest('.popup')));
+  }
+  handleSubmit(makeRequest, evt);
 });
 
 
-function renderLoading(isLoading, form) {
-  if(isLoading) {
-    form.querySelector('.button').textContent = 'Сохранение...'
-  } else {
-    form.querySelector('.button').textContent = 'Сохранить'
-  }
-}
 
 enableValidation(settings); 
 
