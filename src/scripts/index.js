@@ -86,5 +86,5 @@ Promise.all([getUserInfo(), getInitialCards()])
     });
   })
   .catch((err) => {
-    console.log(err);
+    console.error(`Ошибка: ${err}`);
   }); 

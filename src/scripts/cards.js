@@ -1,4 +1,3 @@
-import { openPopup, closePopup } from "./modal";
 import { likeCard, deleteCard } from "./api.js";
 
 const popupImage = document.querySelector('.popup_type_image');
@@ -55,8 +54,8 @@ function like(item, cardId) {
         item.nextElementSibling.textContent = data.likes.length;
       })
       .catch((err) => {
-        console.log(err);
-      });;
+        console.error(`Ошибка: ${err}`);
+      });
   } else {
     likeCard(cardId, 'PUT')
       .then((data) => {
@@ -64,8 +63,9 @@ function like(item, cardId) {
         item.nextElementSibling.textContent = data.likes.length;
       })
       .catch((err) => {
-        console.log(err);
-      });;
+        console.error(`Ошибка: ${err}`);
+      });
+      
   };
 };
 
@@ -74,7 +74,7 @@ function removeCard(card, id) {
   deleteCard(id)
     .then(() => card.remove())
     .catch((err) => {
-      console.log(err);
+      console.error(`Ошибка: ${err}`);
     });
 };
 
