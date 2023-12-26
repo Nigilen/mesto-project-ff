@@ -36,8 +36,8 @@ function setEventListeners(validationConfig, form) {
   })
 }
 
-function hasInvalidInput(inputList) {
-  return inputList.some((inputElement) => {
+function hasInvalidInput(list) {
+  return list.some((inputElement) => {
     return !inputElement.validity.valid;
   })
 }

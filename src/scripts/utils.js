@@ -1,3 +1,5 @@
+import { closePopup } from "./modal";
+
 export function checkResponse(res) {
   if (res.ok) return res.json();
   return Promise.reject(`Ошибка: ${res.status}`);
@@ -18,6 +20,7 @@ export function handleSubmit(request, evt, loadingText = 'Сохранение..
     .then(() => {
       evt.target.reset();
       submitButton.disabled = true;
+      closePopup(evt.target.closest('.popup'))
     })
     .catch((err) => {
       console.error(`Ошибка: ${err}`);

@@ -14,8 +14,6 @@ function createCard(item, cbRemove, cbLike, cbFullImg, userId) {
   const cardLike = cloneCard.querySelector('.card__like-button');
   const btnDelete = cloneCard.querySelector('.card__delete-button');
   const cardLikeCounter = cloneCard.querySelector('.card__like-counter');
-  const deletePopup = document.querySelector('.popup_type_delete-card');
-  const deletePopupForm = deletePopup.querySelector('.popup__form');
         
   cardImg.setAttribute('src', item.link);
   cardImg.setAttribute('alt', item.name);
@@ -31,38 +29,7 @@ function createCard(item, cbRemove, cbLike, cbFullImg, userId) {
 
   if (item.owner._id == userId) {
     btnDelete.addEventListener('click', () => {
-      openPopup(deletePopup);
-
-      const deleteCard = function(evt) {
-        evt.preventDefault();
-        cbRemove(cloneCard, item._id);
-        closePopup(evt.target.closest('.popup'));
-      }
-
-      new Promise(function(resolve, reject) {
-        const handleClickDelPopup = function(evt) {
-          if(evt.target.classList.contains('button')) {
-            deletePopup.removeEventListener('mousedown', handleClickDelPopup);
-            document.removeEventListener('keydown', handleClickDelPopup);
-            resolve()
-          } else if (evt.target.classList.contains('popup_type_delete-card') || 
-                    evt.target.classList.contains('popup__close') ||
-                    evt.key === "Escape") {
-            deletePopup.removeEventListener('mousedown', handleClickDelPopup);
-            document.removeEventListener('keydown', handleClickDelPopup);
-            reject()
-          } 
-        }
-        deletePopup.addEventListener('mousedown', handleClickDelPopup);
-        document.addEventListener('keydown', handleClickDelPopup);
-      })
-      .then(() => {
-        deletePopupForm.addEventListener('submit', deleteCard);
-      })
-      .catch(() => {
-        deletePopupForm.removeEventListener('submit', deleteCard);
-      })
-  
+      cbRemove(cloneCard, item._id);
     })
   } else {
     btnDelete.remove();
@@ -71,9 +38,9 @@ function createCard(item, cbRemove, cbLike, cbFullImg, userId) {
   cardLike.addEventListener('click', () => cbLike(cardLike, item._id) );
 
   cardImg.addEventListener('click', () => {
-    popupPicture.src = cardImg.src;
-    popupPicture.setAttribute('alt', cardTitle.textContent);
-    popupCaption.textContent = cardTitle.textContent;
+    popupPicture.src = item.link;
+    popupPicture.setAttribute('alt', item.name);
+    popupCaption.textContent = item.name;
     cbFullImg(popupImage);
   });
 
@@ -105,7 +72,7 @@ function like(item, cardId) {
 
 function removeCard(card, id) {
   deleteCard(id)
-    .then(card.remove())
+    .then(() => card.remove())
     .catch((err) => {
       console.log(err);
     });
