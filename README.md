@@ -1,6 +1,6 @@
 # Проектная работа "Mesto"
 
-Стек: HTML, SCSS, TS, Webpack
+Стек: HTML, JS, Webpack
 
 Ссылка на GH Pages https://nigilen.github.io/mesto-project-ff/
 
