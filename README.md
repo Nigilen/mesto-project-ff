@@ -4,7 +4,7 @@
 
 **СТЕК**: HTML, CSS, JS, Webpack
 
-**ДЕПЛОЙ**: [ссылка]((https://nigilen.github.io/mesto-project-ff/)
+**ДЕПЛОЙ**: [ссылка](https://nigilen.github.io/mesto-project-ff/)
 
 ___
 
